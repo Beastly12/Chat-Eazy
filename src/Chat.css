@@ -1,0 +1,88 @@
+/* Chat.css */
+.chat-item {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  cursor: pointer;
+  margin: 2px;
+  border-radius: 8px;
+  margin-top: 11px;
+  /* border-bottom: 1px solid #767171; */
+  transition: 0.5s;
+  background-color: rgb(43, 39, 55);
+}
+
+.chat-item:hover{
+  background-color: #164a82;
+  transition: 0.5s;
+
+}
+
+.profile-picture {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 12px;
+}
+
+.chat-content {
+  flex: 1;
+  display: flex;
+  
+}
+
+.chat-header {
+  display: flex;
+  /* align-items: center; */
+  justify-content: space-between;
+  flex-wrap: wrap;
+  flex-direction: column;
+}
+
+.user-name {
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
+  padding: 0px;
+  text-align: left;
+}
+
+.preview {
+  font-size: 12px;
+  color: #888;
+  margin-top: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+  padding: 0px;
+}
+
+.chat-time {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 4px;
+  flex-wrap: wrap;
+  flex-direction: column;
+  width: 100%;
+}
+
+.time-stamp {
+  font-size: 13px;
+  color: #888;
+}
+
+.unread {
+  background-color: #307fd4;
+  color: #f1f1f1;
+  padding: 1px 5px;
+  margin-top: 4px;
+  border-radius: 50%;
+  font-size: 9px;
+  margin-left: 8px;
+  
+  
+}
+

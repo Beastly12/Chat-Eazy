@@ -1,0 +1,19 @@
+
+.send {
+    display: block;
+}
+
+
+.send #send-button {
+    color: rgb(42, 42, 168);
+
+}
+
+.send #map-button {
+    display: none;
+
+}
+
+.send #image-button {
+    display: none;
+}

@@ -1,6 +1,6 @@
 import  {useCollectionData} from 'react-firebase-hooks/firestore';
 import ChatMessage from './ChatMessage';
-import send from './assets/send.png'
+import send from '../assets/send.png'
 import React, { useRef, useState } from 'react';
 
 

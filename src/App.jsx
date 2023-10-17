@@ -7,19 +7,19 @@ import 'firebase/auth';
 import  {useAuthState} from 'react-firebase-hooks/auth';
 import './App.css'
 import SignIn from './SignIn';
-import ChatRoom from './ChatRoom';
+import ChatRoom from './Components/ChatRoom';
 import Signout from './Signout';
-import ChatMain from './ChatMain';
+import ChatMain from './Controller/ChatMain';
 
 
 firebase.initializeApp({
-  apiKey: "AIzaSyBG6aXPl8putJaK9cNd36aSXnKF9eYcPow",
-  authDomain: "chateazy-81e2f.firebaseapp.com",
-  projectId: "chateazy-81e2f",
-  storageBucket: "chateazy-81e2f.appspot.com",
-  messagingSenderId: "416166048381",
-  appId: "1:416166048381:web:eefe15831ff65fa2577714",
-  measurementId: "G-HMB2WC8J64"
+  apiKey: import.meta.env.VITE_REACT_API_KEY,
+  authDomain: import.meta.env.VITE_REACT_APP_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_REACT_APP_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_REACT_APP_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_REACT_APP_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_REACT_APP_APP_ID,
+  measurementId: import.meta.env.VITE_REACT_APP_MEASUREMENT_ID
 
 
 

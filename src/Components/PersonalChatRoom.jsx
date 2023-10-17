@@ -1,18 +1,19 @@
 import  {useCollectionData} from 'react-firebase-hooks/firestore';
 import ChatMessage from './ChatMessage';
 import firebase from 'firebase';
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState,useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {faPaperPlane, faMapMarkerAlt,faMicrophone, faImage} from '@fortawesome/free-solid-svg-icons';
+import { faMapMarkerAlt,faMicrophone, faImage} from '@fortawesome/free-solid-svg-icons';
 import { faTelegramPlane as fabPaperPlane } from '@fortawesome/free-brands-svg-icons';
-import { faPaperPlane as farPaperPlane } from '@fortawesome/free-regular-svg-icons';
+import { SendOutlined } from '@ant-design/icons';
 import ChatHeader from './ChatHeader';
-import classes from './PersonalChatRoom.css?inline';
+
+
 // import './PersonalChatRoom.css'
 
 
 
-function PersonalChatRoom({firestore,auth,conversationId,receiverName,receiverPhoto}) {
+function PersonalChatRoom({firestore,auth,conversationId,receiverName,receiverPhoto,setMenuOpen,handleGoBack}) {
     
 
     const messagesRef =firestore
@@ -25,6 +26,28 @@ function PersonalChatRoom({firestore,auth,conversationId,receiverName,receiverPh
     const [messages]=useCollectionData(query,{idField:'id'});
     const [formValue,setFormValue]=useState('');
     const automateSlide=useRef();
+    const imageRef=useRef();
+    const [imageInput, setImageInput] = useState(null);
+
+    useEffect(()=>{
+
+
+      automateSlide.current.scrollIntoView({behavior:'smooth'});
+
+
+
+
+    });
+
+
+
+    
+  const handleImageInputChange = (event) => {
+    const file = event.target.files[0];
+    setImageInput(URL.createObjectURL(file));
+  };
+
+
 
    const sendMessage =async(e)=>{
       // message is sent to the database here
@@ -36,12 +59,14 @@ function PersonalChatRoom({firestore,auth,conversationId,receiverName,receiverPh
         await messagesRef.add({
             text:formValue,
             createdAt:firebase.firestore.FieldValue.serverTimestamp(),
+            image:imageInput,
             uid,
             photoURL,
             read: false  
 
         });
         setFormValue('');
+        setImageInput('');
 
     }
     catch(error){
@@ -55,11 +80,11 @@ function PersonalChatRoom({firestore,auth,conversationId,receiverName,receiverPh
    }
 
   //  console.log(classes.send)
-   let btnClass ='';
+   let btnClass ='hidden';
    let mapbtnClass='';
    let ImagebtnClass='';
    if (formValue) {
-     btnClass = ' text-blue-500 rounded-full bg-slate-50 rotate-45  ';
+     btnClass = ' inline-block';
      mapbtnClass=' hidden';
      ImagebtnClass=' hidden ';
     //  console.log(classes.send)
@@ -75,7 +100,7 @@ function PersonalChatRoom({firestore,auth,conversationId,receiverName,receiverPh
 
      
            <div className=' header' >
-              <ChatHeader name={receiverName} photo={receiverPhoto}   />
+              <ChatHeader name={receiverName} photo={receiverPhoto} setMenuOpen={setMenuOpen} goBack={handleGoBack}   />
 
             </div>
 
@@ -98,10 +123,19 @@ function PersonalChatRoom({firestore,auth,conversationId,receiverName,receiverPh
                 className="rounded-lg p-2 text-base text-gray-300 flex-grow bg-gray-800 focus:outline-none focus:ring focus:border-blue-300"
                 placeholder="write a message"
               />
+            <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            ref={imageRef}
+            onChange={handleImageInputChange}
+          />
             <div className={`space-x-2 `} >
-              <FontAwesomeIcon icon={fabPaperPlane} id='send-button' className={`text-gray-500 bg-transparent ${btnClass}`} size="xs" onClick={sendMessage} />
+              {/* <button className={`pl-0 w-12 rounded-md mb-2 text-center hover:bg-slate-700  overflow-hidden text-indigo-600 bg-transparent text-base  ${btnClass}`}  onClick={sendMessage} >Send</button> */}
+              <button className={` w-11 h-11 mt-1 flex items-center justify-center  text-2xl    rounded-lg   hover:bg-gray-800  overflow-hidden text-indigo-600 bg-transparent  ${btnClass} `} onClick={sendMessage}  ><SendOutlined className='  cursor-pointer  ' /></button>
+              <FontAwesomeIcon icon={fabPaperPlane} id='send-button' className={`text-gray-500 bg-transparent ${mapbtnClass}`} size="xs"  />
               <FontAwesomeIcon icon={faMapMarkerAlt} id='map-button' className={`text-gray-500 bg-transparent ${mapbtnClass} `}  size="xs" />
-              <FontAwesomeIcon icon={faImage} id='image-button' className={`text-gray-500 bg-transparent  ${ImagebtnClass} `} size="xs" />
+              <FontAwesomeIcon icon={faImage} id='image-button' className={`text-gray-500 hover:text-indigo-600 bg-transparent cursor-pointer  ${ImagebtnClass} `} size="xs" onClick={() => imageRef.current.click()} />
             </div>
    
       </form>

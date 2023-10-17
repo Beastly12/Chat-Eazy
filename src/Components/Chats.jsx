@@ -3,6 +3,7 @@ import  {useCollectionData} from 'react-firebase-hooks/firestore';
 import React, { useState } from 'react';
 import firebase from 'firebase/app';
 import 'firebase/auth';
+import { Empty } from 'antd';
 
 
 function Chats(props) {
@@ -26,7 +27,7 @@ function Chats(props) {
 
  
 	const chatArray = props.users.map((user,i)=>{
-    console.log(user)
+    // console.log(user)
 
 		return (
         <Chat key={i} 
@@ -51,7 +52,12 @@ function Chats(props) {
       <div>
         
         
-        {chatArray}
+        {props.users ? chatArray : <Empty />
+        
+        
+        
+        
+        }
               
       </div>
     )

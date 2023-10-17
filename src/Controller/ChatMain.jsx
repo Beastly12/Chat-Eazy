@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import 'firebase/auth';
 import  {useCollectionData} from 'react-firebase-hooks/firestore';
 import 'firebase/firestore';
-import Chats from './Chats';
-import Scroll from "./hoc/Scroll";
+import Chats from '../Components/Chats';
+import Scroll from "../hoc/Scroll";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
-import PersonalChatRoom from './PersonalChatRoom';
-import ChatSettings from './ChatSettings';
+import PersonalChatRoom from '../Components/PersonalChatRoom';
+import ChatSettings from '../Components/ChatSettings';
+import MessagesSkeleton from '../Components/MessagesSkeleton';
+
 
 
 function ChatMain({firebase,firestore,auth}) {
@@ -16,7 +18,11 @@ function ChatMain({firebase,firestore,auth}) {
   const [conversationId, setConversationId] = useState(null);
   const [receiverName,setReceiverName]=useState(null);
   const [receiverPhoto,setReceiverPhoto]=useState(null);
-  const [receiverEmail,setReceiverEmail]=useState(null)
+  const [receiverEmail,setReceiverEmail]=useState(null);
+  const [recentChats,setRecentChats]=useState([]);
+  const [menuOpen,setMenuOpen]=useState(false);
+  const [chatOpen, setChatOpen]=useState(false);
+  
 
 
 
@@ -26,44 +32,41 @@ function ChatMain({firebase,firestore,auth}) {
   // console.log(users);
 
   useEffect(() => {
-    // Fetch the registered users from Firebase Authentication
-    
-   
     const fetchUsers = async () => {
       try {
-        
-        const usersRef =await firestore.collection('users').get();
-        const users = usersRef.docs.map((doc) => ({ id: doc.id, ...doc.data() }));;
-        console.log(users);
-        const userRecords = users;
-        
-        console.log(userRecords);
-        // const emails = userRecords.users.map((user) => user.email);
-        setUserList(userRecords);
+        const usersSnapshot = await firestore.collection('users').get();
+        const users = usersSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        // console.log(users);
+  
+        setUserList(users);
+  
+        const currentUserID = auth.currentUser.uid;
+        const currentUserDoc = await firestore.collection('users').doc(currentUserID).get();
+        const recentChats = currentUserDoc.data().recentChats || [];
+  
+        const filteredUsers = users.filter((user) => recentChats.includes(user.id));
+        setRecentChats(filteredUsers);
       } catch (error) {
-        console.log('Error fetching user data:', error);
+        console.error('Error fetching user data:', error);
       }
     };
-    
-   
-    // const fetchUsers = async () => {
-    //   try {
-    //     const userRecords = await auth.listUsers();
-        
-    //     console.log(userRecords);
-    //     // const emails = userRecords.users.map((user) => user.email);
-    //     setUserList(userRecords.users);
-    //   } catch (error) {
-    //     console.log('Error fetching user data:', error);
-    //   }
-    // };
-    
+  
     fetchUsers();
-    // const {uid,photoURL}=auth.currentUser;
-    // console.log(auth.listUsers);
-    
-    
   }, []);
+  
+
+
+
+ 
+
+
+
+
+
+
+
+
+  
 
 
 
@@ -87,11 +90,13 @@ function ChatMain({firebase,firestore,auth}) {
 
       const currentUserConversationsSnapshot = await currentUserConversationsRef.get();
 
+
       const existingConversations = currentUserConversationsSnapshot.docs.filter(doc => {
           const participants = doc.data().participants;
           // console.log(participants.includes(receiverId));
           return participants.includes(receiverId) && currentUserID!=receiverId;
       });
+
 
      
       if (existingConversations.length > 0) {   
@@ -118,13 +123,14 @@ function ChatMain({firebase,firestore,auth}) {
         setReceiverName(receiver_name);
         setReceiverPhoto(receiver_url);
         setReceiverEmail(receiver_email)
+        openChat();
       
     } catch (error) {
       console.error('Error Creating collection:', error);
     }
 
 
-    console.log("user clicked")
+    // console.log("user clicked")
 
 
 
@@ -132,6 +138,7 @@ function ChatMain({firebase,firestore,auth}) {
 
   }
 
+  //adds a user to the recentChats  object in the Sender and Receiver user field in Firestore
   const addToRecentChats = async (receiver, currentUser) => {
     const receiverRef = firestore.collection('users').doc(receiver);
     const currentRef = firestore.collection('users').doc(currentUser);
@@ -160,21 +167,28 @@ function ChatMain({firebase,firestore,auth}) {
 
 
  const filteredUsers =userList.filter(user =>{
-  console.log(user)
+  // console.log(user)
   return user.displayName.toLowerCase().trim().replace(/\s+/g, '').includes(searchField.toLowerCase());
     
 
   });	
 
-  const recentUsers=async()=>{
-    const currentUserID = auth.currentUser.uid;
-    const currentUserInfo=userList.filter(user =>{  
-      return user.id.includes(currentUserID);
-      });	
+  // Mobile logic 
 
+  const openUserInfo=()=>{
+    setMenuOpen(!menuOpen);
 
 
   }
+
+  const openChat=()=>{
+    setChatOpen(!chatOpen)
+
+
+  }
+
+
+ 
 
 
   const onSearchChange=(event)=>{
@@ -188,9 +202,11 @@ function ChatMain({firebase,firestore,auth}) {
   return (
     <div className=' flex xl:flex xl:flex-wrap xl:flex-row h-full'>
       
-       <div id='messages-div' className='w-[30%] h-full pt-4 side'>
+       <div id='messages-div' className={`md:w-[30%] md:block w-full  h-full pt-4 side ${
+          chatOpen ? ' hidden ' : 'block'
+        }   `}>
         
-          <p  className="text-2xl font-semibold text-left" >Messages</p>
+          <p  className="text-2xl pl-6 md:pl-0 font-semibold text-left" >Messages</p>
           <Scroll>
           <div className="flex items-center relative rounded mt-2 pr-14 pl-3 pb-4 pt-2">
               <FontAwesomeIcon icon={faSearch} className="text-gray-500 ml-2 absolute" size='xs'/>
@@ -201,14 +217,16 @@ function ChatMain({firebase,firestore,auth}) {
                 onChange={onSearchChange}
               />
           </div>
-          {searchField && <Chats users={filteredUsers} click={userClicked}    /> }
-          {/* {!searchField && <Chats/>    } */}
-
+         <Chats users={searchField ? filteredUsers : recentChats} click={userClicked} />
+          {/* {!searchField && <Chats users={recentChats} click={userClicked} />    }  */}
+          {/* {!searchField && !recentChats  ? <MessagesSkeleton />  : null } */}
           </Scroll>
        </div>
        
 
-       <div id='chatroom-div' className='w-[50%] h-full '>
+       <div id='chatroom-div' className={` md:w-[50%] w-full h-full md:block  ${
+          chatOpen&&!menuOpen ? ' block ' : 'hidden'
+        } `}>
        {conversationId && (
         
           <PersonalChatRoom
@@ -217,13 +235,20 @@ function ChatMain({firebase,firestore,auth}) {
             conversationId={conversationId} // Pass the conversationId as a prop
             receiverName={receiverName}
             receiverPhoto={receiverPhoto}
+            setMenuOpen={openUserInfo}
+            handleGoBack={openChat}
           />
+
+
+          
         )}
 
        </div>
 
-       <div id='settings-div' className='w-[20%] h-full  '>
-         <ChatSettings name={receiverName} photo={receiverPhoto} />
+       <div id='settings-div' className={`md:w-[20%] md:block w-full h-full  ${
+          menuOpen ? ' block ' : 'hidden'
+        }   `}>
+         <ChatSettings name={receiverName} photo={receiverPhoto} userEmail={receiverEmail} handleGoBack={openUserInfo} />
        </div>
          
         

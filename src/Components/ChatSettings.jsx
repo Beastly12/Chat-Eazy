@@ -19,7 +19,7 @@ const ChatSettings=(props) =>{
                                 className=" cursor-pointer p-0 m-0 transition-transform transparent 
                                                     border-none rounded-[50%] relative outline-none touch-manipulation inline-block   "
                             >
-                              <IoIosArrowDropleft className=" text-2xl"/>
+                              <IoIosArrowDropleft className=" text-2xl text-white"/>
                             </button>
                             </div>
                             <div className=" text-lg font-semibold">

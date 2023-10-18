@@ -8,7 +8,7 @@ import {IoIosArrowBack as IoIosArrowDropleft} from 'react-icons/io';
 const ChatHeader = (props) => {
     return (
         <div  className="flex items-center justify-between p-5 h-[70px] relative   border-gray-700 space-x-2   " >
-            <div className=" absolute left-1 block  md:hidden     "  onClick={()=>props.goBack()} ><IoIosArrowDropleft className=" text-base "/></div>
+            <div className=" absolute left-1 block  md:hidden     "  onClick={()=>props.goBack()} ><IoIosArrowDropleft className=" text-base text-white "/></div>
 
             <div className="flex items-center space-x-4" onClick={()=>props.setMenuOpen()}>
                 <img className="w-12 h-12 rounded-full object-cover " src={props.photo || 'https://robohash.org/1?size=200x200'} alt="User" />
